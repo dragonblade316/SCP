@@ -20,8 +20,8 @@ bot = commands.Bot(intents=intents, command_prefix="!")
 
 # global online = False
 
-# @tasks.loop(hours=24) 
-@tasks.loop(seconds=10) 
+@tasks.loop(hours=24) 
+# @tasks.loop(seconds=10) 
 async def QOTD_task():
     print(f"QOTD channel id: {config["QOTD_id"]}")
 
