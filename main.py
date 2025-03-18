@@ -93,14 +93,14 @@ async def QOTD_add(ctx, question: str):
 
 @bot.command()
 @commands.has_role("QOTD")
-async def QOTD_list(ctx, question: str):
+async def QOTD_list(ctx):
     questions = json.loads(open("./QOTD.json", "r+").read())["questions"]
 
-    final = f"There are {len(questions)} in queue. \n"
+    final = f"There are {len(questions)} questions in queue. \n\n"
     num = 0
 
     for i in questions:
-        final += f"{num}  {i}\n"
+        final += f"{num}: {i}\n"
         num += 1
         
     await ctx.send(final)
