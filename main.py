@@ -5,6 +5,7 @@ from discord.ext import tasks, commands
 import json
 import asyncio
 from datetime import date
+from profanity_check import predict, predict_prob
 
 
 config_file = open("./config.json", "r").read()
@@ -104,7 +105,27 @@ async def QOTD_list(ctx):
         num += 1
         
     await ctx.send(final)
- 
+
+
+@bot.event 
+async def on_message(message):
+    prob = predict_prob([message.content]).max()
+    deleted = False
+
+    if prob > config["automod_limit"]:
+        await message.delete()
+        await message.channel.send(f"{message.author.mention}")
+        await message.channel.send("https://tenor.com/view/captain-america-marvel-avengers-gif-14328153")
+        deleted = True
+
+    print(f"message: {message.content} \n prob_of_insult: {prob} \n deleted: {deleted}")
+        
+
+    
+@bot.event 
+async def on_start():
+    print("starting QOTD")
+    await QOTD_task.start()
 
 bot.run(token)
 
