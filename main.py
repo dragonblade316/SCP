@@ -109,8 +109,39 @@ async def QOTD_list(ctx):
     await ctx.send(final)
 
 
+@bot.command()
+@commands.has_role("Commander")
+async def blacklist(ctx, blacklisted_word):
+    print("blacklisted")
+    profanity.add_censor_words([blacklisted_word])
+    config["blacklisted_words"].append(blacklisted_word)
+    
+
+    config_file_w = open("./config.json", "w")
+    config_file_w.write(json.dumps(config))
+    config_file_w.close()
+
+    await ctx.send("blacklisted")
+
+@bot.command()
+@commands.has_role("Commander")
+async def whitelist(ctx, whitelisted_word):
+    print("whitelisted")
+    
+    config["whitelisted_words"].append(whitelisted_word)
+    profanity.load_censor_words(whitelist_words=config["whitelisted_words"])
+    
+    config_file_w = open("./config.json", "w")
+    config_file_w.write(json.dumps(config))
+    config_file_w.close()
+
+    await ctx.send("whitelisted")
+
+
 @bot.event 
 async def on_message(message):
+    await bot.process_commands(message)
+
     deleted = False
 
     async def censor():
@@ -135,11 +166,13 @@ async def on_message(message):
     print(f"message: {message.content} \n prob_of_insult: {prob} \n deleted: {deleted}")
         
 
-    
-@bot.event 
-async def on_start():
-    print("starting QOTD")
-    await QOTD_task.start()
+#
+# @bot.event 
+# async def on_start():
+#     print("starting QOTD")
+#     await QOTD_task.start()
+#
 
+profanity.add_censor_words(config["blacklisted_words"])
 bot.run(token)
 
