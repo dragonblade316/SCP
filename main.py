@@ -172,7 +172,7 @@ async def on_message(message):
 #     print("starting QOTD")
 #     await QOTD_task.start()
 #
-
+profanity.load_censor_words(whitelist_words=config["whitelisted_words"])
 profanity.add_censor_words(config["blacklisted_words"])
 bot.run(token)
 
