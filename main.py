@@ -121,6 +121,9 @@ async def QOTD_list(ctx):
 @commands.has_role("Commander")
 async def blacklist(ctx, blacklisted_word):
     print("blacklisted")
+
+    #lowercase appears to be needed
+    blacklisted_word = blacklisted_word.lower()
     profanity.add_censor_words([blacklisted_word])
     config["blacklisted_words"].append(blacklisted_word)
     
@@ -135,7 +138,9 @@ async def blacklist(ctx, blacklisted_word):
 @commands.has_role("Commander")
 async def whitelist(ctx, whitelisted_word):
     print("whitelisted")
-    
+
+    #lowercase appears to be needed
+    whitelisted_word = whitelisted_word.lower() 
     config["whitelisted_words"].append(whitelisted_word)
     profanity.load_censor_words(whitelist_words=config["whitelisted_words"])
     
