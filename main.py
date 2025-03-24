@@ -26,6 +26,16 @@ bot = commands.Bot(intents=intents, command_prefix="!")
 
 # global online = False
 
+async def log(message):
+    channel = bot.get_channel(int(config["log_id"]))
+
+    if type(channel) != discord.channel.TextChannel:
+        print("wrong channel or channel not found")
+        print(type(channel))
+        return 
+
+    await channel.send(message)
+
 @tasks.loop(hours=24) 
 async def QOTD_task():
     await QOTD_post()
@@ -155,6 +165,9 @@ async def whitelist(ctx, whitelisted_word):
 async def on_message(message):
     await bot.process_commands(message)
 
+    if message.author.id == 864917095077511178:
+        return
+
     deleted = False
 
     async def censor():
@@ -168,6 +181,7 @@ async def on_message(message):
     if profanity.contains_profanity(message.content):
         await censor()
         deleted = True
+        await log(f"message: ||{message.content}|| \n Deleted by word filter \n deleted: {deleted}")
         print(f"message: {message.content} \n Deleted by word filter \n deleted: {deleted}")
         return
 
@@ -175,6 +189,8 @@ async def on_message(message):
 
     if prob > config["automod_limit"]:
         await censor()
+        deleted = True
+        await log(f"message: ||{message.content}|| \n prob_of_insult: {prob} \n deleted: {deleted}")
 
     print(f"message: {message.content} \n prob_of_insult: {prob} \n deleted: {deleted}")
         
