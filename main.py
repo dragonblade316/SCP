@@ -6,6 +6,9 @@ import json
 import asyncio
 from datetime import date
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from profanity_check import predict, predict_prob
 from better_profanity import profanity
 
@@ -24,8 +27,10 @@ bot = commands.Bot(intents=intents, command_prefix="!")
 # global online = False
 
 @tasks.loop(hours=24) 
-# @tasks.loop(seconds=10) 
 async def QOTD_task():
+    await QOTD_post()
+
+async def QOTD_post():
     print(f"QOTD channel id: {config["QOTD_id"]}")
 
     channel = bot.get_channel(int(config["QOTD_id"]))
@@ -56,16 +61,19 @@ async def QOTD_task():
     except Exception as e:
         print(e)
 
+#
+# @bot.command()
+# @commands.has_role("QOTD")
+# async def QOTD_start(ctx):
+#     # if online == True:
+#     #     return
+#     await QOTD_task.start()
+#     await ctx.send("QOTD system started. Do not run this command again")
+#     online = True
 
 @bot.command()
-@commands.has_role("QOTD")
-async def QOTD_start(ctx):
-    # if online == True:
-    #     return
-    await QOTD_task.start()
-    await ctx.send("QOTD system started. Do not run this command again")
-    online = True
-
+async def QOTD(ctx):
+    await QOTD_post()
 
 @bot.command()
 @commands.has_role("QOTD")
@@ -171,8 +179,14 @@ async def on_message(message):
 # async def on_start():
 #     print("starting QOTD")
 #     await QOTD_task.start()
-#
-profanity.load_censor_words(config["blacklisted_words"], whitelist_words=config["whitelisted_words"])
-# profanity.add_censor_words(config["blacklisted_words"])
-bot.run(token)
+
+async def main():
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(QOTD_post, 'cron', hour=800, minute=0)
+    scheduler.start()
+
+    profanity.load_censor_words(config["blacklisted_words"], whitelist_words=config["whitelisted_words"])
+    await bot.start(token)
+
+asyncio.run(main())
 
