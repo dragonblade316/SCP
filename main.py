@@ -220,7 +220,8 @@ async def on_message(message):
 
 async def main():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(QOTD_post, 'cron', hour=8, minute=0)
+    #utc
+    scheduler.add_job(QOTD_post, 'cron', hour=14, minute=0)
     scheduler.start()
 
     profanity.load_censor_words(config["blacklisted_words"], whitelist_words=config["whitelisted_words"])
