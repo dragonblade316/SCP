@@ -173,6 +173,10 @@ async def update(ctx):
     await ctx.send("update complete, restarting")
     subprocess.run(["systemctl", "restart", "--user", "SCP.service"])
 
+@bot.command()
+async def lol(ctx):
+    await ctx.send("lol")
+
 
 @bot.event 
 async def on_message(message):
