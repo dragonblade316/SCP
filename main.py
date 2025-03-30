@@ -12,6 +12,11 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from profanity_check import predict, predict_prob
 from better_profanity import profanity
 
+import subprocess
+
+# subprocess.run(["ls", "-l"]) 
+
+
 
 config_file = open("./config.json", "r").read()
 config = json.loads(config_file)
@@ -159,6 +164,14 @@ async def whitelist(ctx, whitelisted_word):
     config_file_w.close()
 
     await ctx.send("whitelisted")
+
+@bot.command()
+@commands.has_role("Bot Lord")
+async def update(ctx):
+    await ctx.send("starting update")
+    subprocess.run(["git", "pull"])
+    await ctx.send("update complete, restarting")
+    subprocess.run(["systemctl", "restart", "--user", "SCP.service"])
 
 
 @bot.event 
