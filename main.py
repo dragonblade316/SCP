@@ -204,11 +204,11 @@ async def on_message(message):
 
     prob = predict_prob([message.content]).max()
 
-    if prob > config["automod_limit"]:
-        await censor()
-        deleted = True
-        await log(f"message: ||{message.content}|| \n prob_of_insult: {prob} \n deleted: {deleted}")
-
+    # if prob > config["automod_limit"]:
+    #     await censor()
+    #     deleted = True
+    #     await log(f"message: ||{message.content}|| \n prob_of_insult: {prob} \n deleted: {deleted}")
+    
     print(f"message: {message.content} \n prob_of_insult: {prob} \n deleted: {deleted}")
         
 
