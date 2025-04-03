@@ -190,7 +190,7 @@ async def lol(ctx):
 async def on_message(message):
     await bot.process_commands(message)
 
-    if not filter:
+    if (filter == False):
         return
 
     if message.author.id == 864917095077511178:
