@@ -31,6 +31,8 @@ bot = commands.Bot(intents=intents, command_prefix="!")
 
 # global online = False
 
+filter = True
+
 async def log(message):
     channel = bot.get_channel(int(config["log_id"]))
 
@@ -166,6 +168,11 @@ async def whitelist(ctx, whitelisted_word):
     await ctx.send("whitelisted")
 
 @bot.command()
+@commands.has_role("Commander")
+async def toggle_filter(ctx):
+    filter = not filter
+
+@bot.command()
 @commands.has_role("Bot Lord")
 async def update(ctx):
     await ctx.send("starting update")
@@ -181,6 +188,9 @@ async def lol(ctx):
 @bot.event 
 async def on_message(message):
     await bot.process_commands(message)
+
+    if not filter:
+        return
 
     if message.author.id == 864917095077511178:
         return
