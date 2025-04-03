@@ -170,6 +170,7 @@ async def whitelist(ctx, whitelisted_word):
 @bot.command()
 @commands.has_role("Commander")
 async def toggle_filter(ctx):
+    ctx.send(f"filter: {filter}")
     filter = not filter
 
 @bot.command()
