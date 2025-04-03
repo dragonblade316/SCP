@@ -169,7 +169,7 @@ async def whitelist(ctx, whitelisted_word):
 
 @bot.command()
 @commands.has_role("Commander")
-async def toggle_filter(ctx):
+async def filter(ctx):
     filter = not filter
     await ctx.send(f"filter status: {filter}")
 
@@ -190,9 +190,9 @@ async def lol(ctx):
 async def on_message(message):
     await bot.process_commands(message)
 
-    if (filter == False):
-        return
-
+    # if (filter == False):
+    #     return
+    #
     if message.author.id == 864917095077511178:
         return
 
