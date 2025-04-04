@@ -31,7 +31,6 @@ bot = commands.Bot(intents=intents, command_prefix="!")
 
 # global online = False
 
-filter = True
 
 async def log(message):
     channel = bot.get_channel(int(config["log_id"]))
@@ -193,41 +192,36 @@ async def on_message(message):
     # if (filter == False):
     #     return
     #
-    if message.author.id == 864917095077511178:
-        return
-
-    deleted = False
-
-    async def censor():
-        if deleted:
-            return
-
-        await message.delete()
-        await message.channel.send(f"{message.author.mention}")
-        await message.channel.send("https://tenor.com/view/captain-america-marvel-avengers-gif-14328153")
-
-    if profanity.contains_profanity(message.content):
-        await censor()
-        deleted = True
-        await log(f"message: ||{message.content}|| \n Deleted by word filter \n deleted: {deleted}")
-        print(f"message: {message.content} \n Deleted by word filter \n deleted: {deleted}")
-        return
-
-    prob = predict_prob([message.content]).max()
-
-    # if prob > config["automod_limit"]:
+    # if message.author.id == 864917095077511178:
+    #     return
+    #
+    # deleted = False
+    #
+    # async def censor():
+    #     if deleted:
+    #         return
+    #
+    #     await message.delete()
+    #     await message.channel.send(f"{message.author.mention}")
+    #     await message.channel.send("https://tenor.com/view/captain-america-marvel-avengers-gif-14328153")
+    #
+    # if profanity.contains_profanity(message.content):
     #     await censor()
     #     deleted = True
-    #     await log(f"message: ||{message.content}|| \n prob_of_insult: {prob} \n deleted: {deleted}")
-    
-    print(f"message: {message.content} \n prob_of_insult: {prob} \n deleted: {deleted}")
-        
+    #     await log(f"message: ||{message.content}|| \n Deleted by word filter \n deleted: {deleted}")
+    #     print(f"message: {message.content} \n Deleted by word filter \n deleted: {deleted}")
+    #     return
+    #
+    # prob = predict_prob([message.content]).max()
+    #
+    # # if prob > config["automod_limit"]:
+    # #     await censor()
+    # #     deleted = True
+    # #     await log(f"message: ||{message.content}|| \n prob_of_insult: {prob} \n deleted: {deleted}")
+    #
+    # print(f"message: {message.content} \n prob_of_insult: {prob} \n deleted: {deleted}")
+    #
 
-#
-# @bot.event 
-# async def on_start():
-#     print("starting QOTD")
-#     await QOTD_task.start()
 
 async def main():
     scheduler = AsyncIOScheduler()
