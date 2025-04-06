@@ -184,6 +184,12 @@ async def update(ctx):
 async def lol(ctx):
     await ctx.send("lol")
 
+@bot.command()
+async def roll(ctx):
+    import random
+    await ctx.send("rolling d20")
+    await ctx.send(random.randint(1,20))
+
 
 @bot.event 
 async def on_message(message):
