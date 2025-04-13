@@ -1,4 +1,4 @@
-from os import write
+from os import walk, write
 from typing import Any, Optional
 import discord
 from discord.ext import tasks, commands
@@ -9,13 +9,9 @@ from datetime import date
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from profanity_check import predict, predict_prob
-from better_profanity import profanity
-
 import subprocess
 
 # subprocess.run(["ls", "-l"]) 
-
 
 
 config_file = open("./config.json", "r").read()
@@ -41,10 +37,6 @@ async def log(message):
         return 
 
     await channel.send(message)
-
-@tasks.loop(hours=24) 
-async def QOTD_task():
-    await QOTD_post()
 
 async def QOTD_post():
     print(f"QOTD channel id: {config["QOTD_id"]}")
@@ -76,16 +68,6 @@ async def QOTD_post():
 
     except Exception as e:
         print(e)
-
-#
-# @bot.command()
-# @commands.has_role("QOTD")
-# async def QOTD_start(ctx):
-#     # if online == True:
-#     #     return
-#     await QOTD_task.start()
-#     await ctx.send("QOTD system started. Do not run this command again")
-#     online = True
 
 @bot.command()
 async def QOTD(ctx):
@@ -132,46 +114,6 @@ async def QOTD_list(ctx):
         
     await ctx.send(final)
 
-
-@bot.command()
-@commands.has_role("Commander")
-async def blacklist(ctx, blacklisted_word):
-    print("blacklisted")
-
-    #lowercase appears to be needed
-    blacklisted_word = blacklisted_word.lower()
-    profanity.add_censor_words([blacklisted_word])
-    config["blacklisted_words"].append(blacklisted_word)
-    
-
-    config_file_w = open("./config.json", "w")
-    config_file_w.write(json.dumps(config))
-    config_file_w.close()
-
-    await ctx.send("blacklisted")
-
-@bot.command()
-@commands.has_role("Commander")
-async def whitelist(ctx, whitelisted_word):
-    print("whitelisted")
-
-    #lowercase appears to be needed
-    whitelisted_word = whitelisted_word.lower() 
-    config["whitelisted_words"].append(whitelisted_word)
-    profanity.load_censor_words(whitelist_words=config["whitelisted_words"])
-    
-    config_file_w = open("./config.json", "w")
-    config_file_w.write(json.dumps(config))
-    config_file_w.close()
-
-    await ctx.send("whitelisted")
-
-@bot.command()
-@commands.has_role("Commander")
-async def filter(ctx):
-    filter = not filter
-    await ctx.send(f"filter status: {filter}")
-
 @bot.command()
 @commands.has_role("Bot Lord")
 async def update(ctx):
@@ -190,52 +132,13 @@ async def roll(ctx):
     await ctx.send("rolling d20")
     await ctx.send(random.randint(1,20))
 
-
-@bot.event 
-async def on_message(message):
-    await bot.process_commands(message)
-
-    # if (filter == False):
-    #     return
-    #
-    # if message.author.id == 864917095077511178:
-    #     return
-    #
-    # deleted = False
-    #
-    # async def censor():
-    #     if deleted:
-    #         return
-    #
-    #     await message.delete()
-    #     await message.channel.send(f"{message.author.mention}")
-    #     await message.channel.send("https://tenor.com/view/captain-america-marvel-avengers-gif-14328153")
-    #
-    # if profanity.contains_profanity(message.content):
-    #     await censor()
-    #     deleted = True
-    #     await log(f"message: ||{message.content}|| \n Deleted by word filter \n deleted: {deleted}")
-    #     print(f"message: {message.content} \n Deleted by word filter \n deleted: {deleted}")
-    #     return
-    #
-    # prob = predict_prob([message.content]).max()
-    #
-    # # if prob > config["automod_limit"]:
-    # #     await censor()
-    # #     deleted = True
-    # #     await log(f"message: ||{message.content}|| \n prob_of_insult: {prob} \n deleted: {deleted}")
-    #
-    # print(f"message: {message.content} \n prob_of_insult: {prob} \n deleted: {deleted}")
-    #
-
-
 async def main():
     scheduler = AsyncIOScheduler()
+
     #utc
     scheduler.add_job(QOTD_post, 'cron', hour=14, minute=0)
     scheduler.start()
 
-    profanity.load_censor_words(config["blacklisted_words"], whitelist_words=config["whitelisted_words"])
     await bot.start(token)
 
 asyncio.run(main())
