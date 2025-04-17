@@ -158,7 +158,7 @@ async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  
     ]
     
     await sink.vc.disconnect()  # Disconnect from the voice channel.
-    files = [discord.File(audio.file, f"{user_id}.encoding}") for user_id, audio in sink.audio_data.items()]  # List down the files.
+    files = [discord.File(audio.file, f"{user_id.encoding}") for user_id, audio in sink.audio_data.items()]  # List down the files.
     
     await channel.send(f"finished recording audio for: {', '.join(recorded_users)}.", files=files)  # Send a message with the accumulated files.
 
