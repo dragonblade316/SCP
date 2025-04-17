@@ -5,6 +5,7 @@ from discord.ext import tasks, commands
 import json
 import asyncio
 from datetime import date
+from datetime import time
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -38,10 +39,14 @@ async def log(message):
 
     await channel.send(message)
 
+
+#<QOTD>
 async def QOTD_post():
     print(f"QOTD channel id: {config["QOTD_id"]}")
 
     channel = bot.get_channel(int(config["QOTD_id"]))
+
+    print(type(channel))
 
     if type(channel) != discord.channel.ForumChannel:
         print("wrong channel or channel not found")
@@ -68,6 +73,11 @@ async def QOTD_post():
 
     except Exception as e:
         print(e)
+
+@tasks.loop(time=time(hour=12, minute=0))
+async def qotd_task():
+    await QOTD_post()
+
 
 @bot.command()
 async def QOTD(ctx):
@@ -113,7 +123,10 @@ async def QOTD_list(ctx):
         num += 1
         
     await ctx.send(final)
+# </QOTD>
 
+
+#matnence
 @bot.command()
 @commands.has_role("Bot Lord")
 async def update(ctx):
@@ -129,17 +142,81 @@ async def lol(ctx):
 @bot.command()
 async def roll(ctx):
     import random
-    await ctx.send("rolling d20")
+    await ctx.respond("rolling d20")
     await ctx.send(random.randint(1,20))
 
-async def main():
-    scheduler = AsyncIOScheduler()
 
-    #utc
-    scheduler.add_job(QOTD_post, 'cron', hour=14, minute=0)
-    scheduler.start()
+#<cpp enforcement>
+connections = {}
 
-    await bot.start(token)
+async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  # Our voice client already passes these in.
 
-asyncio.run(main())
 
+    recorded_users = [  # A list of recorded users
+        f"<@{user_id}>"
+        for user_id, audio in sink.audio_data.items()
+    ]
+    
+    await sink.vc.disconnect()  # Disconnect from the voice channel.
+    files = [discord.File(audio.file, f"{user_id}.encoding}") for user_id, audio in sink.audio_data.items()]  # List down the files.
+    
+    await channel.send(f"finished recording audio for: {', '.join(recorded_users)}.", files=files)  # Send a message with the accumulated files.
+
+    await channel.send("test complete")
+
+    
+@bot.command()
+async def record(ctx):  # If you're using commands.Bot, this will also work.
+    voice = ctx.author.voice
+
+    # if not voice:
+    #     await ctx.respond("You aren't in a voice channel!")
+    #
+    vc = await voice.channel.connect()  # Connect to the voice channel the author is in.
+    connections.update({ctx.guild.id: vc})  # Updating the cache with the guild and channel.
+
+    vc.start_recording(
+        discord.sinks.MP3Sink(),  # The sink type to use.
+        once_done,  # What to do once done.
+        ctx.channel  # The channel to disconnect from.
+    )
+    await ctx.send("Started recording!")
+
+@bot.command()
+async def stop_recording(ctx):
+    if ctx.guild.id in connections:  # Check if the guild is in the cache.
+        vc = connections[ctx.guild.id]
+        vc.stop_recording()  # Stop recording, and call the callback (once_done).
+        del connections[ctx.guild.id]  # Remove the guild from the cache.
+        # await ctx.delete()  # And delete.
+    else:
+        await ctx.respond("I am currently not recording here.")  # Respond with this if we aren't recording.
+        
+
+#</cpp enforcement>
+
+#<events>
+# @bot.event
+# async def on_voice_state_update(member, before, after):
+#     if before.channel is None and after.channel:
+#        # User has connected to a VoiceChannel
+#        channel = after.channel
+#        # Code here...
+#
+#</events>
+
+@bot.listen(once=True)
+async def on_ready():
+    qotd_task.start()
+
+# async def main():
+#     scheduler = AsyncIOScheduler()
+#     #
+#     # #utc
+#     # scheduler.add_job(QOTD_post, 'cron', hour=14, minute=0)
+#     # scheduler.start()
+#     await bot.start(token)
+#
+# asyncio.run(main())
+
+bot.run(token)
