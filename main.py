@@ -78,11 +78,13 @@ async def qotd_task():
     await qotd_post()
 
 
-@bot.slash_command()
+@bot.slash_command(descrpition="Instantanly triggers the next qotd")
+@commands.has_role("QOTD")
 async def qotd(ctx):
     await qotd_post()
+    ctx.respond("done")
 
-@bot.slash_command()
+@bot.slash_command(description="Adds a question to queue")
 @commands.has_role("QOTD")
 async def qotd_add(ctx, question: str):
     ctx.author
@@ -104,12 +106,12 @@ async def qotd_add(ctx, question: str):
 
     j = json.dumps(expression)
     print(j)
-    
-    await ctx.send(f"Added question: {question} to the queue")
 
     open("./QOTD.json", "w").write(j)
+    
+    await ctx.respond(f"Added question: '{question}' to the queue")
 
-@bot.slash_command()
+@bot.slash_command(description="Lists the questions in queue")
 @commands.has_role("QOTD")
 async def qotd_list(ctx):
     questions = json.loads(open("./QOTD.json", "r+").read())["questions"]
@@ -121,28 +123,29 @@ async def qotd_list(ctx):
         final += f"{num}: {i}\n"
         num += 1
         
-    await ctx.send(final)
+    await ctx.respond(final)
 # </QOTD>
 
 
 #matnence
-@bot.slash_command()
+@bot.slash_command(description="Updates the bot")
 @commands.has_role("Bot Lord")
 async def update(ctx):
-    await ctx.send("starting update")
+    await ctx.respond("starting update")
     subprocess.run(["git", "pull"])
     await ctx.send("update complete, restarting")
     subprocess.run(["systemctl", "restart", "--user", "SCP.service"])
+    
 
-@bot.slash_command()
+@bot.slash_command(description="lol")
 async def lol(ctx):
-    await ctx.send("lol")
+    await ctx.respond("lol")
 
-@bot.slash_command()
+@bot.slash_command(description="Rolls a d20")
 async def roll(ctx):
     import random
     await ctx.respond("rolling d20")
-    await ctx.send(random.randint(1,20))
+    await ctx.respond(random.randint(1,20))
 
 
 #<cpp enforcement>
@@ -180,7 +183,7 @@ async def cpp(ctx):  # If you're using commands.Bot, this will also work.
         once_done,  # What to do once done.
         ctx.channel  # The channel to disconnect from.
     )
-    await ctx.send("Started recording!")
+    await ctx.respond("Started recording!")
 
 
 # @bot.command()
