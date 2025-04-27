@@ -40,7 +40,7 @@ async def log(message):
 
 
 #<QOTD>
-async def QOTD_post():
+async def qotd_post():
     print(f"QOTD channel id: {config["QOTD_id"]}")
 
     channel = bot.get_channel(int(config["QOTD_id"]))
@@ -79,7 +79,7 @@ async def qotd_task():
 
 
 @bot.slash_command()
-async def QOTD(ctx):
+async def qotd(ctx):
     await QOTD_post()
 
 @bot.slash_command()
@@ -111,7 +111,7 @@ async def QOTD_add(ctx, question: str):
 
 @bot.slash_command()
 @commands.has_role("QOTD")
-async def QOTD_list(ctx):
+async def qotd_list(ctx):
     questions = json.loads(open("./QOTD.json", "r+").read())["questions"]
 
     final = f"There are {len(questions)} questions in queue. \n\n"
