@@ -7,10 +7,9 @@ import asyncio
 from datetime import date
 from datetime import time
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 import subprocess
+
+from discord.types.channel import Channel
 
 # subprocess.run(["ls", "-l"]) 
 
@@ -31,7 +30,7 @@ bot = commands.Bot(intents=intents, command_prefix="!")
 
 async def log(message):
     channel = bot.get_channel(int(config["log_id"]))
-
+    
     if type(channel) != discord.channel.TextChannel:
         print("wrong channel or channel not found")
         print(type(channel))
@@ -147,7 +146,7 @@ async def roll(ctx):
 
 
 #<cpp enforcement>
-connections = {}
+cpp_connections = {}
 
 async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  # Our voice client already passes these in.
 
@@ -158,22 +157,23 @@ async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  
     ]
     
     await sink.vc.disconnect()  # Disconnect from the voice channel.
-    files = [discord.File(audio.file, f"{user_id.encoding}") for user_id, audio in sink.audio_data.items()]  # List down the files.
-    
-    await channel.send(f"finished recording audio for: {', '.join(recorded_users)}.", files=files)  # Send a message with the accumulated files.
+    files = [discord.File(audio.file, f"{user_id}{sink.encoding}.") for user_id, audio in sink.audio_data.items()]  # List down the files.
+  
+    logchannel = bot.get_channel(int(config["log_id"]))
 
-    await channel.send("test complete")
+    await logchannel.send(f"finished recording audio for: {', '.join(recorded_users)}.", files=files)  # Send a message with the accumulated files.
+
 
     
 @bot.command()
-async def record(ctx):  # If you're using commands.Bot, this will also work.
+async def cpp(ctx):  # If you're using commands.Bot, this will also work.
     voice = ctx.author.voice
 
     # if not voice:
     #     await ctx.respond("You aren't in a voice channel!")
     #
     vc = await voice.channel.connect()  # Connect to the voice channel the author is in.
-    connections.update({ctx.guild.id: vc})  # Updating the cache with the guild and channel.
+    cpp_connections.update({ctx.guild.id: vc})  # Updating the cache with the guild and channel.
 
     vc.start_recording(
         discord.sinks.MP3Sink(),  # The sink type to use.
@@ -182,12 +182,13 @@ async def record(ctx):  # If you're using commands.Bot, this will also work.
     )
     await ctx.send("Started recording!")
 
+
 @bot.command()
 async def stop_recording(ctx):
-    if ctx.guild.id in connections:  # Check if the guild is in the cache.
-        vc = connections[ctx.guild.id]
+    if ctx.guild.id in cpp_connections:  # Check if the guild is in the cache.
+        vc = cpp_connections[ctx.guild.id]
         vc.stop_recording()  # Stop recording, and call the callback (once_done).
-        del connections[ctx.guild.id]  # Remove the guild from the cache.
+        del cpp_connections[ctx.guild.id]  # Remove the guild from the cache.
         # await ctx.delete()  # And delete.
     else:
         await ctx.respond("I am currently not recording here.")  # Respond with this if we aren't recording.
@@ -196,27 +197,34 @@ async def stop_recording(ctx):
 #</cpp enforcement>
 
 #<events>
-# @bot.event
-# async def on_voice_state_update(member, before, after):
-#     if before.channel is None and after.channel:
-#        # User has connected to a VoiceChannel
-#        channel = after.channel
-#        # Code here...
-#
+@bot.event
+async def on_voice_state_update(member, before, after):
+    #
+    # if before.channel is not None and after.channel is None:
+    #     # Log the event, send a message, etc.
+    #     print(f"{member.name} left the voice channel.")
+    channel = after.channel
+    
+    if before.channel is not None and after.channel is None:
+       # User has connected to a VoiceChannel
+       channel = before.channel
+
+        
+    print(channel.members)
+    if len(channel.members) <= 1 or len(channel.members) >= 4: 
+        if channel.guild.id in cpp_connections:  # Check if the guild is in the cache.
+            vc = cpp_connections[channel.guild.id]
+            vc.stop_recording()  # Stop recording, and call the callback (once_done).
+            del cpp_connections[channel.guild.id]  # Remove the guild from the cache.
+            # await ctx.delete()  # And delete.
+
+            
+       # Code here...
+
 #</events>
 
 @bot.listen(once=True)
 async def on_ready():
     qotd_task.start()
-
-# async def main():
-#     scheduler = AsyncIOScheduler()
-#     #
-#     # #utc
-#     # scheduler.add_job(QOTD_post, 'cron', hour=14, minute=0)
-#     # scheduler.start()
-#     await bot.start(token)
-#
-# asyncio.run(main())
 
 bot.run(token)
