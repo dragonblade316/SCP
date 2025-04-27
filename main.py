@@ -168,7 +168,7 @@ async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  
 
 
     
-@bot.slash_command(description="Robosmith will join the call and begin recording until a third person joins the call. It is meant to act as an artificial third person for cpp reasons.")
+@bot.slash_command(description="Robosmith will join the call and begin recording until a third person joins the call.")
 async def cpp(ctx):  # If you're using commands.Bot, this will also work.
     voice = ctx.author.voice
 
