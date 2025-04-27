@@ -75,16 +75,16 @@ async def qotd_post():
 
 @tasks.loop(time=time(hour=12, minute=0))
 async def qotd_task():
-    await QOTD_post()
+    await qotd_post()
 
 
 @bot.slash_command()
 async def qotd(ctx):
-    await QOTD_post()
+    await qotd_post()
 
 @bot.slash_command()
 @commands.has_role("QOTD")
-async def QOTD_add(ctx, question: str):
+async def qotd_add(ctx, question: str):
     ctx.author
 
     try:
