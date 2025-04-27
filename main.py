@@ -78,11 +78,11 @@ async def qotd_task():
     await QOTD_post()
 
 
-@bot.command()
+@bot.slash_command()
 async def QOTD(ctx):
     await QOTD_post()
 
-@bot.command()
+@bot.slash_command()
 @commands.has_role("QOTD")
 async def QOTD_add(ctx, question: str):
     ctx.author
@@ -109,7 +109,7 @@ async def QOTD_add(ctx, question: str):
 
     open("./QOTD.json", "w").write(j)
 
-@bot.command()
+@bot.slash_command()
 @commands.has_role("QOTD")
 async def QOTD_list(ctx):
     questions = json.loads(open("./QOTD.json", "r+").read())["questions"]
@@ -126,7 +126,7 @@ async def QOTD_list(ctx):
 
 
 #matnence
-@bot.command()
+@bot.slash_command()
 @commands.has_role("Bot Lord")
 async def update(ctx):
     await ctx.send("starting update")
@@ -134,11 +134,11 @@ async def update(ctx):
     await ctx.send("update complete, restarting")
     subprocess.run(["systemctl", "restart", "--user", "SCP.service"])
 
-@bot.command()
+@bot.slash_command()
 async def lol(ctx):
     await ctx.send("lol")
 
-@bot.command()
+@bot.slash_command()
 async def roll(ctx):
     import random
     await ctx.respond("rolling d20")
@@ -165,7 +165,7 @@ async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  
 
 
     
-@bot.command()
+@bot.slash_command()
 async def cpp(ctx):  # If you're using commands.Bot, this will also work.
     voice = ctx.author.voice
 
@@ -183,7 +183,7 @@ async def cpp(ctx):  # If you're using commands.Bot, this will also work.
     await ctx.send("Started recording!")
 
 
-@bot.command()
+# @bot.command()
 async def stop_recording(ctx):
     if ctx.guild.id in cpp_connections:  # Check if the guild is in the cache.
         vc = cpp_connections[ctx.guild.id]
