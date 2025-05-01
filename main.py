@@ -85,6 +85,7 @@ async def qotd(ctx):
     ctx.respond("done")
 
 @bot.slash_command(description="Adds a question to queue")
+
 @commands.has_role("QOTD")
 async def qotd_add(ctx, question: str):
     ctx.author
@@ -110,6 +111,74 @@ async def qotd_add(ctx, question: str):
     open("./QOTD.json", "w").write(j)
     
     await ctx.respond(f"Added question: '{question}' to the queue")
+
+@bot.slash_command(description="Remove a question to queue")
+@commands.has_role("QOTD")
+async def qotd_remove(ctx, index: int):
+    ctx.author
+
+    try:
+        expression = json.loads(open("./QOTD.json", "r+").read())
+    except FileNotFoundError:
+        open("./QOTD.json", "x")
+        expression = {"questions": [""]}
+
+            
+
+    #cheesing the interpruter a bit here. dont change    
+    if "questions" not in expression.keys() or type(expression["questions"]) != list:
+        expression["questions"] = []
+
+    try: 
+        question = expression["questions"].pop(index)
+    except IndexError as e:
+        ctx.respond("index does not exist")
+    print(f"expression: {expression}")
+
+    j = json.dumps(expression)
+    print(j)
+
+    open("./QOTD.json", "w").write(j)
+    
+    await ctx.respond(f"Removed question: '{question}' from the queue")
+
+
+@bot.slash_command(description="Moves a question to the front of the queue")
+@commands.has_role("QOTD")
+async def qotd_next(ctx, index: int):
+    ctx.author
+
+    try:
+        expression = json.loads(open("./QOTD.json", "r+").read())
+    except FileNotFoundError:
+        open("./QOTD.json", "x")
+        expression = {"questions": [""]}
+
+            
+
+    #cheesing the interpruter a bit here. dont change    
+    if "questions" not in expression.keys() or type(expression["questions"]) != list:
+        expression["questions"] = []
+
+    try: 
+        question = expression["questions"].pop(index)
+        expression["questions"].insert(0, question)
+    except IndexError as e:
+        ctx.respond("index does not exist")
+
+        
+    print(f"expression: {expression}")
+
+    j = json.dumps(expression)
+    print(j)
+
+    open("./QOTD.json", "w").write(j)
+    
+    await ctx.respond(f"Moved question: '{question}' to the front of the queue")
+
+
+
+
 
 @bot.slash_command(description="Lists the questions in queue")
 @commands.has_role("QOTD")
