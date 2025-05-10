@@ -252,7 +252,7 @@ async def cpp(ctx):  # If you're using commands.Bot, this will also work.
         once_done,  # What to do once done.
         ctx.channel  # The channel to disconnect from.
     )
-    await ctx.respond()
+    await ctx.respond("")
 
 
 # @bot.command()
