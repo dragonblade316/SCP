@@ -1,3 +1,4 @@
+import datetime
 from os import walk, write
 from typing import Any, Optional
 import discord
@@ -16,6 +17,8 @@ from discord.types.channel import Channel
 
 config_file = open("./config.json", "r").read()
 config = json.loads(config_file)
+
+format_string = "%Y-%m-%d %H:%M:%S"
 
 token = config["token"]
 print(token)
@@ -38,6 +41,12 @@ async def log(message):
 
     await channel.send(message)
 
+def write_to_config():
+    j = json.dumps(config)
+    open("./QOTD.json", "w").write(j)
+
+# def reload_config():
+    # config = json.loads(open("./QOTD.json", "r+").read())
 
 #<QOTD>
 async def qotd_post():
@@ -195,6 +204,29 @@ async def qotd_list(ctx):
     await ctx.respond(final)
 # </QOTD>
 
+
+#<ocp>
+async def time_since_ocp():
+    data = json.loads(open("./config.json", "r+").read())
+    time = datetime.datetime.strptime(data["time_since_ocp"], format_string)
+
+    return (datetime.datetime.now() - time).days
+    
+@bot.slash_command(description="")
+# @commands.has_role("QOTD")
+async def ocp_mentioned(ctx):
+    await ctx.respond(f"It has been {time_since_ocp()} days since ocps have been mentioned.")
+    data = json.loads(open("./config.json", "r+").read())
+    data["time_since_ocp"] = datetime.datetime.now().strftime(format_string)
+
+    j = json.dumps(data)
+    open("./config.json", "w").write(j)
+
+@bot.slash_command(description="")
+# @commands.has_role("QOTD")
+async def ocp(ctx):
+    await ctx.respond(f"It has been {time_since_ocp()} days since ocps have been mentioned.")
+#
 
 #matnence
 @bot.slash_command(description="Updates the bot")
