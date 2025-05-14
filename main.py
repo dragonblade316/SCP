@@ -210,7 +210,7 @@ async def time_since_ocp():
     data = json.loads(open("./config.json", "r+").read())
     time = datetime.datetime.strptime(data["time_since_ocp"], format_string)
 
-    return (datetime.datetime.now() - time).days
+    return str((datetime.datetime.now() - time).days)
     
 @bot.slash_command(description="")
 # @commands.has_role("QOTD")
