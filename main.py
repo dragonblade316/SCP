@@ -206,7 +206,7 @@ async def qotd_list(ctx):
 
 
 #<ocp>
-async def time_since_ocp():
+def time_since_ocp():
     data = json.loads(open("./config.json", "r+").read())
     time = datetime.datetime.strptime(data["time_since_ocp"], format_string)
 
