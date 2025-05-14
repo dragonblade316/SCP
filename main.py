@@ -212,7 +212,7 @@ def time_since_ocp():
 
     return (datetime.datetime.now() - time)
     
-@bot.slash_command(description="")
+@bot.slash_command(description="Use this command whenever ocp's are mentioned")
 # @commands.has_role("QOTD")
 async def ocp_mentioned(ctx):
     since = time_since_ocp()
@@ -224,7 +224,7 @@ async def ocp_mentioned(ctx):
     j = json.dumps(data)
     open("./config.json", "w").write(j)
 
-@bot.slash_command(description="")
+@bot.slash_command(description="To get the time since the last time ocp's have been mentioned.")
 # @commands.has_role("QOTD")
 async def ocp(ctx):
     since = time_since_ocp()
