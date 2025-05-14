@@ -217,7 +217,7 @@ def time_since_ocp():
 async def ocp_mentioned(ctx):
     since = time_since_ocp()
 
-    await ctx.respond(f"It has been {since.days} days and {since.seconds} seconds since ocps have been mentioned.")
+    await ctx.respond(f"It has been {since.days} days and {since.hours} hours since ocps have been mentioned.")
     data = json.loads(open("./config.json", "r+").read())
     data["time_since_ocp"] = datetime.datetime.now().strftime(format_string)
 
@@ -227,7 +227,8 @@ async def ocp_mentioned(ctx):
 @bot.slash_command(description="")
 # @commands.has_role("QOTD")
 async def ocp(ctx):
-    await ctx.respond(f"It has been {time_since_ocp()} days since ocps have been mentioned.")
+    since = time_since_ocp()
+    await ctx.respond(f"It has been {since.days} days and {since.hours} hours since ocps have been mentioned.")
 #
 
 #matnence
