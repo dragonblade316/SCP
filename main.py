@@ -254,6 +254,8 @@ async def roll(ctx):
 
 #<cpp enforcement>
 cpp_connections = {}
+record_connections = {}
+
 
 async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  # Our voice client already passes these in.
 
@@ -289,13 +291,31 @@ async def cpp(ctx):  # If you're using commands.Bot, this will also work.
     )
     await ctx.respond("enabled")
 
+@bot.slash_command(description="Robosmith will record until a third person joins the call.")
+@commands.has_role("Staff")
+async def record(ctx):  # If you're using commands.Bot, this will also work.
+    voice = ctx.author.voice
 
-# @bot.command()
+    # if not voice:
+    #     await ctx.respond("You aren't in a voice channel!")
+    #
+    vc = await voice.channel.connect()  # Connect to the voice channel the author is in.
+    record_connections.update({ctx.guild.id: vc})  # Updating the cache with the guild and channel.
+
+    vc.start_recording(
+        discord.sinks.MP3Sink(),  # The sink type to use.
+        once_done,  # What to do once done.
+        ctx.channel  # The channel to disconnect from.
+    )
+    await ctx.respond("recording")
+
+@bot.slash_command()
+@commands.has_role("Staff")
 async def stop_recording(ctx):
-    if ctx.guild.id in cpp_connections:  # Check if the guild is in the cache.
-        vc = cpp_connections[ctx.guild.id]
+    if ctx.guild.id in record_connections:  # Check if the guild is in the cache.
+        vc = record_connections[ctx.guild.id]
         vc.stop_recording()  # Stop recording, and call the callback (once_done).
-        del cpp_connections[ctx.guild.id]  # Remove the guild from the cache.
+        del record_connections[ctx.guild.id]  # Remove the guild from the cache.
         # await ctx.delete()  # And delete.
     else:
         await ctx.respond("I am currently not recording here.")  # Respond with this if we aren't recording.
