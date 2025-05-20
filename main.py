@@ -266,7 +266,7 @@ async def once_done(sink: discord.sinks, channel: discord.TextChannel, *args):  
     ]
     
     await sink.vc.disconnect()  # Disconnect from the voice channel.
-    files = [discord.File(audio.file, f"{user_id}{sink.encoding}.") for user_id, audio in sink.audio_data.items()]  # List down the files.
+    files = [discord.File(audio.file, f"{user_id}.{sink.encoding}") for user_id, audio in sink.audio_data.items()]  # List down the files.
   
     logchannel = bot.get_channel(int(config["log_id"]))
 
