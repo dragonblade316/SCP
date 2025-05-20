@@ -292,7 +292,7 @@ async def cpp(ctx):  # If you're using commands.Bot, this will also work.
     await ctx.respond("enabled")
 
 @bot.slash_command(description="Robosmith will record until a third person joins the call.")
-@commands.has_role("Staff")
+# @commands.has_role("Staff")
 async def record(ctx):  # If you're using commands.Bot, this will also work.
     voice = ctx.author.voice
 
