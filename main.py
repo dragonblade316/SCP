@@ -91,10 +91,9 @@ async def qotd_task():
 @commands.has_role("QOTD")
 async def qotd(ctx):
     await qotd_post()
-    ctx.respond("done")
+    await ctx.respond("done")
 
 @bot.slash_command(description="Adds a question to queue")
-
 @commands.has_role("QOTD")
 async def qotd_add(ctx, question: str):
     ctx.author
