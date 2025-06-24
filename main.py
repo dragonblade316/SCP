@@ -185,22 +185,6 @@ async def qotd_next(ctx, index: int):
     await ctx.respond(f"Moved question: '{question}' to the front of the queue")
 
 
-@bot.command()
-async def fix(ctx, member: discord.Member, role_name: str):
-    """Assigns a role to a user."""
-    try:
-        role = discord.utils.get(ctx.guild.roles, name=role_name)
-        if role is None:
-            await ctx.send(f"Role '{role_name}' not found.")
-            return
-
-        await member.add_roles(role)
-        await ctx.send(f"Successfully added role '{role.name}' to {member.mention}")
-
-    except Exception as e:
-        await ctx.send(f"An error occurred: {e}")
-
-
 @bot.slash_command(description="Lists the questions in queue")
 @commands.has_role("QOTD")
 async def qotd_list(ctx):
