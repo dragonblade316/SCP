@@ -344,6 +344,25 @@ async def on_voice_state_update(member, before, after):
             
        # Code here...
 
+log_file = open("logs.dislog", 'a')
+
+@bot.listen()
+async def on_message(message: discord.Message):
+    print(message.content)
+
+    sender = message.author
+
+    entry = {
+        "content": message.content,
+        "sender_id": sender.id,
+        "global_name": sender.global_name,
+        "display_name": sender.display_name,
+        "date": message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    print(entry)
+
+    json.dump(entry, log_file)
 #</events>
 
 @bot.listen(once=True)
