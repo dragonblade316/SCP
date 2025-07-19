@@ -1,4 +1,5 @@
 import datetime
+import math
 from os import walk, write
 from typing import Any, Optional
 import discord
@@ -213,18 +214,24 @@ def time_since_ocp():
 async def ocp_mentioned(ctx):
     since = time_since_ocp()
 
-    await ctx.respond(f"It has been {since.days} days and {since.hours} hours since ocps have been mentioned.")
+    # await ctx.respond(f"It has been {since.days} days and {round((since.seconds / 3600) - (since.days * 24))} hours since ocps have been mentioned.")
     data = json.loads(open("./config.json", "r+").read())
     data["time_since_ocp"] = datetime.datetime.now().strftime(format_string)
 
     j = json.dumps(data)
     open("./config.json", "w").write(j)
 
+    await ctx.respond("Reset the counter.")
+
 @bot.slash_command(description="To get the time since the last time ocp's have been mentioned.")
 # @commands.has_role("QOTD")
 async def ocp(ctx):
     since = time_since_ocp()
-    await ctx.respond(f"It has been {since.days} days and {since.hours} hours since ocps have been mentioned.")
+    #alternitive format
+    if math.floor(since.seconds / 3600) == 0:
+        await ctx.respond(f"It has been {math.floor(since.seconds / 3600)} hours and {round((since.seconds / 60) - (math.floor(since.seconds / 3600) * 60))} minutes since ocps have been mentioned.")
+        return
+    await ctx.respond(f"It has been {since.days} days and {round((since.seconds / 3600) - (since.days * 24))} hours since ocps have been mentioned.")
 #
 
 #matnence
