@@ -370,6 +370,18 @@ async def on_message(message: discord.Message):
     print(entry)
 
     json.dump(entry, log_file)
+
+
+    if "ocp" in message.content.lower():
+        if not message.author.bot:
+            data = json.loads(open("./config.json", "r+").read())
+            data["time_since_ocp"] = datetime.datetime.now().strftime(format_string)
+
+            j = json.dumps(data)
+            open("./config.json", "w").write(j)
+            await message.channel.send("OCP's mentioned, reset the counter. ._.")
+
+
 #</events>
 
 @bot.listen(once=True)
